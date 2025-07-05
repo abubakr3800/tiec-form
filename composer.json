@@ -1,0 +1,35 @@
+{
+    "name": "tiec/registration-system",
+    "description": "نظام التسجيل والإدارة لـ TIEC",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "TIEC Team",
+            "email": "info@tiec.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "ext-pdo": "*",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "TIEC\\": "src/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "install-db": "mysql -u root -p < database.sql"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

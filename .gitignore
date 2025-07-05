@@ -1,0 +1,43 @@
+# ملفات النظام
+.DS_Store
+Thumbs.db
+
+# ملفات PHP
+*.log
+*.cache
+*.tmp
+
+# ملفات قاعدة البيانات
+*.sql
+*.db
+
+# ملفات التكوين الحساسة
+config/database.php
+.env
+
+# مجلدات التحميل
+uploads/
+temp/
+
+# ملفات IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ملفات Composer
+vendor/
+composer.lock
+
+# ملفات Node.js
+node_modules/
+package-lock.json
+
+# ملفات النسخ الاحتياطي
+*.bak
+*.backup
+*.old
+
+# ملفات الأمان
+.htpasswd
+.htaccess.backup 

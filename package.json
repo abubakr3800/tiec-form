@@ -1,0 +1,53 @@
+{
+    "name": "tiec-registration-system",
+    "version": "1.0.0",
+    "description": "نظام التسجيل والإدارة لـ TIEC",
+    "main": "index.php",
+    "scripts": {
+        "build": "npm run build:css && npm run build:js",
+        "build:css": "sass src/scss:assets/css --style compressed",
+        "build:js": "webpack --mode production",
+        "dev": "npm run dev:css && npm run dev:js",
+        "dev:css": "sass src/scss:assets/css --watch",
+        "dev:js": "webpack --mode development --watch",
+        "test": "jest"
+    },
+    "dependencies": {
+        "bootstrap": "^5.3.0",
+        "jquery": "^3.7.1",
+        "datatables.net": "^1.13.7",
+        "datatables.net-bs5": "^1.13.7",
+        "datatables.net-buttons-bs5": "^2.4.2",
+        "qrcode": "^1.5.3",
+        "font-awesome": "^6.0.0"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.22.0",
+        "@babel/preset-env": "^7.22.0",
+        "babel-loader": "^9.1.0",
+        "css-loader": "^6.8.0",
+        "jest": "^29.5.0",
+        "sass": "^1.63.0",
+        "style-loader": "^3.3.0",
+        "webpack": "^5.88.0",
+        "webpack-cli": "^5.1.0"
+    },
+    "keywords": [
+        "php",
+        "mysql",
+        "registration",
+        "admin",
+        "bootstrap",
+        "datatables"
+    ],
+    "author": "TIEC Team",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/tiec/registration-system.git"
+    },
+    "bugs": {
+        "url": "https://github.com/tiec/registration-system/issues"
+    },
+    "homepage": "https://github.com/tiec/registration-system#readme"
+} 
