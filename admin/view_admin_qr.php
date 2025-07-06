@@ -40,6 +40,9 @@ try {
     
     $qr_json = json_encode($qr_data);
     
+    // Create print HTML content
+    $print_html = '<html><head><title>QR Code المشرف</title><style>body { font-family: Arial, sans-serif; text-align: center; padding: 20px; } .qr-container { margin: 20px; }</style></head><body><h2>QR Code المشرف: ' . htmlspecialchars($admin['name']) . '</h2><div class="qr-container"><div id="qrcode"></div></div><script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script><script>QRCode.toCanvas(document.getElementById("qrcode"), ' . $qr_json . ', {width: 300, margin: 2}, function (error) {if (error) console.error(error); else window.print();});</script></body></html>';
+    
 } catch (Exception $e) {
     header('Location: admins.php');
     exit();
@@ -54,7 +57,6 @@ try {
     <title>QR Code المشرف - لوحة التحكم</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -231,6 +233,7 @@ try {
                                 مشاركة QR Code
                             </button>
                         </div>
+                        <div id="print-content" data-print-content="<?php echo htmlspecialchars($print_html); ?>" style="display: none;"></div>
                     </div>
                 </div>
             </div>
@@ -239,61 +242,86 @@ try {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
     
     <script>
-        // Generate QR Code
-        const qrData = <?php echo json_encode($qr_json); ?>;
-        
-        QRCode.toCanvas(document.getElementById('qrcode'), qrData, {
-            width: 200,
-            margin: 2,
-            color: {
-                dark: '#000000',
-                light: '#FFFFFF'
+        // Wait for QRCode library to load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, checking QRCode...');
+            
+            // Try multiple ways to check for QRCode
+            if (typeof QRCode !== 'undefined') {
+                console.log('QRCode found via QRCode');
+                generateQRCode();
+            } else if (typeof window.QRCode !== 'undefined') {
+                console.log('QRCode found via window.QRCode');
+                generateQRCode();
+            } else {
+                console.error('QRCode library not loaded');
+                console.log('Available global objects:', Object.keys(window).filter(key => key.toLowerCase().includes('qr')));
+                document.getElementById('qrcode').innerHTML = '<p class="text-danger">خطأ في تحميل مكتبة QR Code</p>';
+                
+                // Try to load QRCode manually
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js';
+                script.onload = function() {
+                    console.log('QRCode loaded manually');
+                    generateQRCode();
+                };
+                script.onerror = function() {
+                    console.error('Failed to load QRCode manually');
+                };
+                document.head.appendChild(script);
             }
-        }, function (error) {
-            if (error) console.error(error);
         });
+        
+        function generateQRCode() {
+            try {
+                const qrData = <?php echo json_encode($qr_json, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS); ?>;
+                
+                QRCode.toCanvas(document.getElementById('qrcode'), qrData, {
+                    width: 200,
+                    margin: 2,
+                    color: {
+                        dark: '#000000',
+                        light: '#FFFFFF'
+                    }
+                }, function (error) {
+                    if (error) {
+                        console.error('QRCode generation error:', error);
+                        document.getElementById('qrcode').innerHTML = '<p class="text-danger">خطأ في إنشاء QR Code</p>';
+                    } else {
+                        console.log('QRCode generated successfully');
+                    }
+                });
+            } catch (error) {
+                console.error('Error in generateQRCode:', error);
+                document.getElementById('qrcode').innerHTML = '<p class="text-danger">خطأ في إنشاء QR Code</p>';
+            }
+        }
 
         // Download QR Code
         function downloadQR() {
             const canvas = document.querySelector('#qrcode canvas');
-            const link = document.createElement('a');
-            link.download = 'admin-qr-<?php echo $admin_id; ?>.png';
-            link.href = canvas.toDataURL();
-            link.click();
+            if (canvas) {
+                const link = document.createElement('a');
+                link.download = 'admin-qr-<?php echo $admin_id; ?>.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            } else {
+                alert('QR Code not generated yet');
+            }
         }
 
         // Print QR Code
         function printQR() {
+            const printContent = document.getElementById('print-content').dataset.printContent;
             const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <html>
-                    <head>
-                        <title>QR Code المشرف</title>
-                        <style>
-                            body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-                            .qr-container { margin: 20px; }
-                        </style>
-                    </head>
-                    <body>
-                        <h2>QR Code المشرف: <?php echo htmlspecialchars($admin['name']); ?></h2>
-                        <div class="qr-container">
-                            <div id="qrcode"></div>
-                        </div>
-                        <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-                        <script>
-                            QRCode.toCanvas(document.getElementById('qrcode'), '${qrData}', {
-                                width: 300,
-                                margin: 2
-                            }, function (error) {
-                                if (error) console.error(error);
-                                else window.print();
-                            });
-                        </script>
-                    </body>
-                </html>
-            `);
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+            printWindow.close();
         }
 
         // Share QR Code
@@ -307,14 +335,18 @@ try {
             } else {
                 // Fallback for browsers that don't support Web Share API
                 const canvas = document.querySelector('#qrcode canvas');
-                canvas.toBlob(function(blob) {
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = 'admin-qr-<?php echo $admin_id; ?>.png';
-                    link.click();
-                    URL.revokeObjectURL(url);
-                });
+                if (canvas) {
+                    canvas.toBlob(function(blob) {
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = 'admin-qr-<?php echo $admin_id; ?>.png';
+                        link.click();
+                        URL.revokeObjectURL(url);
+                    });
+                } else {
+                    alert('QR Code not generated yet');
+                }
             }
         }
     </script>

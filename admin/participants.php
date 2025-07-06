@@ -395,35 +395,43 @@ $pdo = getDBConnection();
                     }
                 ],
                 dom: 'Bfrtip',
+                scrollY: '400px',
+                scrollX: true,
+                scrollCollapse: true,
                 buttons: [
                     {
                         extend: 'copy',
-                        text: '<i class="fas fa-copy"></i> نسخ',
-                        className: 'btn btn-secondary'
+                        text: '<i class="fas fa-copy"></i> \u0646\u0633\u062e',
+                        className: 'btn btn-secondary',
+                        exportOptions: { modifier: { page: 'all' } }
                     },
                     {
                         extend: 'csv',
                         text: '<i class="fas fa-file-csv"></i> CSV',
-                        className: 'btn btn-success'
+                        className: 'btn btn-success',
+                        exportOptions: { modifier: { page: 'all' } }
                     },
                     {
                         extend: 'excel',
                         text: '<i class="fas fa-file-excel"></i> Excel',
-                        className: 'btn btn-success'
+                        className: 'btn btn-success',
+                        exportOptions: { modifier: { page: 'all' } }
                     },
                     {
                         extend: 'pdf',
                         text: '<i class="fas fa-file-pdf"></i> PDF',
-                        className: 'btn btn-danger'
+                        className: 'btn btn-danger',
+                        exportOptions: { modifier: { page: 'all' } }
                     },
                     {
                         extend: 'print',
-                        text: '<i class="fas fa-print"></i> طباعة',
-                        className: 'btn btn-info'
+                        text: '<i class="fas fa-print"></i> \u0637\u0628\u0627\u0639\u0629',
+                        className: 'btn btn-info',
+                        exportOptions: { modifier: { page: 'all' } }
                     },
                     {
                         extend: 'colvis',
-                        text: '<i class="fas fa-columns"></i> الأعمدة',
+                        text: '<i class="fas fa-columns"></i> \u0627\u0644\u0623\u0639\u0645\u062f\u0629',
                         className: 'btn btn-warning'
                     }
                 ],

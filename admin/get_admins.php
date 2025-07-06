@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../cache/db.php';
+require_once '../config/database.php';
 
 // التحقق من تسجيل الدخول
 if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'admin') {
@@ -17,9 +17,9 @@ if ($_SESSION['admin_role'] !== 'super_admin') {
 }
 
 try {
-    // $pdo is already available from cache/db.php
+    $pdo = getDBConnection();
     
-    $stmt = $pdo->query("SELECT id, username, name, email, role, is_active, created_at, updated_at, last_login FROM admins ORDER BY created_at DESC");
+    $stmt = $pdo->query("SELECT id, username, name_ar, name_en, email, role, is_active, created_at, updated_at FROM admins ORDER BY created_at DESC");
     $admins = $stmt->fetchAll();
     
     $data = [];
@@ -27,13 +27,14 @@ try {
         $data[] = [
             'id' => $admin['id'],
             'username' => htmlspecialchars($admin['username']),
-            'name' => htmlspecialchars($admin['name']),
+            'name' => htmlspecialchars($admin['name_ar']),
+            'name_en' => htmlspecialchars($admin['name_en']),
             'email' => htmlspecialchars($admin['email']),
             'role' => $admin['role'],
             'is_active' => $admin['is_active'],
             'created_at' => $admin['created_at'],
             'updated_at' => $admin['updated_at'],
-            'last_login' => $admin['last_login']
+            'last_login' => null // حل مشكلة DataTables
         ];
     }
     
