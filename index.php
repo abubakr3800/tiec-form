@@ -105,7 +105,7 @@ $services = $stmt->fetchAll();
                     <div id="alert-container"></div>
 
                     <!-- نموذج التسجيل -->
-                    <form id="registration-form" method="POST" action="process_registration.php">
+                    <form id="registration-form" method="POST" action="process_registration.php" enctype="multipart/form-data">
                         <!-- المعلومات الشخصية -->
                         <div class="row mb-4">
                             <div class="col-12">

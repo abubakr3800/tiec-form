@@ -61,6 +61,66 @@ try {
                 $html .= '></textarea>';
                 break;
                 
+            case 'number':
+                $html .= '<input type="number" class="form-control" id="question_' . $question['id'] . '" ';
+                $html .= 'name="question_' . $question['id'] . '"';
+                if ($question['is_required']) {
+                    $html .= ' required';
+                }
+                $html .= '>';
+                break;
+                
+            case 'date':
+                $html .= '<input type="date" class="form-control" id="question_' . $question['id'] . '" ';
+                $html .= 'name="question_' . $question['id'] . '"';
+                if ($question['is_required']) {
+                    $html .= ' required';
+                }
+                $html .= '>';
+                break;
+                
+            case 'time':
+                $html .= '<input type="time" class="form-control" id="question_' . $question['id'] . '" ';
+                $html .= 'name="question_' . $question['id'] . '"';
+                if ($question['is_required']) {
+                    $html .= ' required';
+                }
+                $html .= '>';
+                break;
+                
+            case 'file':
+                $html .= '<input type="file" class="form-control" id="question_' . $question['id'] . '" ';
+                $html .= 'name="question_' . $question['id'] . '"';
+                if ($question['is_required']) {
+                    $html .= ' required';
+                }
+                $html .= '>';
+                break;
+                
+            case 'url':
+                $html .= '<input type="url" class="form-control" id="question_' . $question['id'] . '" ';
+                $html .= 'name="question_' . $question['id'] . '" placeholder="https://example.com"';
+                if ($question['is_required']) {
+                    $html .= ' required';
+                }
+                $html .= '>';
+                break;
+                
+            case 'checkbox':
+                $html .= '<div class="form-check">';
+                $html .= '<input class="form-check-input" type="checkbox" ';
+                $html .= 'id="question_' . $question['id'] . '" ';
+                $html .= 'name="question_' . $question['id'] . '" value="1"';
+                if ($question['is_required']) {
+                    $html .= ' required';
+                }
+                $html .= '>';
+                $html .= '<label class="form-check-label" for="question_' . $question['id'] . '">';
+                $html .= 'موافق';
+                $html .= '</label>';
+                $html .= '</div>';
+                break;
+                
             case 'select':
             case 'radio':
                 // جلب خيارات السؤال
@@ -82,7 +142,7 @@ try {
                     $html .= '<option value="">اختر...</option>';
                     
                     foreach ($options as $option) {
-                        $html .= '<option value="' . htmlspecialchars($option['option_text_ar']) . '">';
+                        $html .= '<option value="' . htmlspecialchars($option['option_text_en']) . '">';
                         $html .= htmlspecialchars($option['option_text_ar']);
                         $html .= '</option>';
                     }
@@ -94,7 +154,7 @@ try {
                         $html .= '<input class="form-check-input" type="radio" ';
                         $html .= 'id="option_' . $option['id'] . '" ';
                         $html .= 'name="question_' . $question['id'] . '" ';
-                        $html .= 'value="' . htmlspecialchars($option['option_text_ar']) . '"';
+                        $html .= 'value="' . htmlspecialchars($option['option_text_en']) . '"';
                         if ($question['is_required']) {
                             $html .= ' required';
                         }
@@ -105,6 +165,16 @@ try {
                         $html .= '</div>';
                     }
                 }
+                break;
+                
+            default:
+                // إذا كان نوع السؤال غير معروف، نعرضه كنص عادي
+                $html .= '<input type="text" class="form-control" id="question_' . $question['id'] . '" ';
+                $html .= 'name="question_' . $question['id'] . '"';
+                if ($question['is_required']) {
+                    $html .= ' required';
+                }
+                $html .= '>';
                 break;
         }
         

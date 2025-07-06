@@ -1,0 +1,230 @@
+نظام TIEC - سيناريو شامل
+================================
+
+1. نظرة عامة على النظام
+------------------------
+النظام عبارة عن منصة شاملة لإدارة الخدمات التدريبية والاستشارية في TIEC، مع نظام تسجيل ذكي وحضور آلي.
+
+2. أنواع الخدمات (Services)
+---------------------------
+أ) التقديم على التدريبات المتاحة (Training)
+   - كل تدريب له مدرب محدد
+   - مواعيد ثابتة للتدريب
+   - سعة محدودة للتدريب
+   - أسئلة مخصصة حسب نوع التدريب
+
+ب) حجز استشارات فردية للافراد والشركات (Mentoring)
+   - استشارات للأفراد
+   - استشارات للشركات
+   - حجز مواعيد مرنة
+   - أسئلة مخصصة حسب نوع الاستشارة
+
+ج) حجز فترة عمل فى معمل التصنيع الرقمى (FabLab)
+   - حجز فترات عمل
+   - معدات متاحة
+   - أسئلة حول المشروع المطلوب
+
+د) حجز مساحه عمل حرة (Co-Working Space)
+   - حجز مساحات عمل
+   - فترات زمنية مرنة
+   - أسئلة حول نوع العمل
+
+3. هيكل قاعدة البيانات
+-----------------------
+
+جدول participants:
+- id (PK)
+- name
+- national_id (unique)
+- phone
+- email
+- governorate
+- gender
+- age
+- participant_type (student/employee/other)
+- token (unique, auto-generated)
+- created_at
+- updated_at
+
+جدول services:
+- id (PK)
+- name_ar
+- name_en
+- description_ar
+- description_en
+- service_type (training/mentoring/fablab/coworking)
+- is_active
+- sort_order
+- created_at
+- updated_at
+
+جدول trainers:
+- id (PK)
+- name
+- email
+- phone
+- specialization
+- is_active
+- created_at
+- updated_at
+
+جدول trainings:
+- id (PK)
+- service_id (FK)
+- trainer_id (FK)
+- title_ar
+- title_en
+- description_ar
+- description_en
+- start_date
+- end_date
+- start_time
+- end_time
+- max_participants
+- current_participants
+- is_active
+- created_at
+- updated_at
+
+جدول service_questions:
+- id (PK)
+- service_id (FK)
+- question_text_ar
+- question_text_en
+- question_type (text/select/radio/checkbox)
+- is_required
+- sort_order
+- is_active
+- created_at
+
+جدول question_options:
+- id (PK)
+- question_id (FK)
+- option_text_ar
+- option_text_en
+- sort_order
+- is_active
+- created_at
+
+جدول registrations:
+- id (PK)
+- participant_id (FK)
+- service_id (FK)
+- training_id (FK, nullable)
+- registration_date
+- status (pending/confirmed/cancelled)
+- answers (JSON - إجابات الأسئلة)
+- created_at
+- updated_at
+
+جدول attendance:
+- id (PK)
+- participant_id (FK)
+- training_id (FK)
+- attendance_date
+- check_in_time
+- check_out_time
+- status (present/absent/late)
+- created_at
+
+4. سيناريو الاستخدام
+--------------------
+
+أ) تسجيل جديد:
+1. المستخدم يدخل الموقع
+2. يختار نوع الخدمة
+3. تظهر أسئلة مخصصة للخدمة (chain select)
+4. يملأ البيانات الشخصية
+5. يتم إنشاء token فريد
+6. يتم حفظ التسجيل مع الإجابات
+
+ب) تسجيل بواسطة token:
+1. المستخدم يدخل token
+2. النظام يتحقق من صحة الtoken
+3. يظهر بياناته المحفوظة
+4. يمكنه التسجيل في خدمة جديدة
+
+ج) تسجيل الحضور:
+1. صفحة QR Scanner
+2. مسح QR code أو إدخال الرقم القومي
+3. التحقق من وجود تسجيل في تاريخ اليوم
+4. تسجيل الحضور تلقائياً
+
+5. اقتراحات للتحسين
+--------------------
+
+أ) إضافة ميزات أمان:
+- تشفير الـ tokens
+- صلاحية زمنية للـ tokens
+- نظام تنبيهات للـ tokens المفقودة
+
+ب) تحسين تجربة المستخدم:
+- إشعارات SMS/Email للتأكيد
+- تقويم تفاعلي لحجز المواعيد
+- نظام تقييم للخدمات
+
+ج) ميزات إدارية:
+- لوحة تحكم للمدربين
+- تقارير تفصيلية
+- نظام إشعارات للمديرين
+
+د) ميزات تقنية:
+- API للربط مع أنظمة خارجية
+- نظام backup تلقائي
+- تحليلات متقدمة
+
+6. ملاحظات مهمة
+----------------
+
+أ) الأمان:
+- تشفير البيانات الحساسة
+- التحقق من صحة المدخلات
+- حماية من SQL Injection
+
+ب) الأداء:
+- فهرسة قاعدة البيانات
+- تحسين الاستعلامات
+- نظام cache للبيانات المتكررة
+
+ج) المرونة:
+- إمكانية إضافة أنواع خدمات جديدة
+- تخصيص الأسئلة حسب الحاجة
+- نظام صلاحيات مرن
+
+7. مراحل التطوير
+-----------------
+
+المرحلة الأولى:
+- إنشاء قاعدة البيانات
+- نظام التسجيل الأساسي
+- نظام الحضور البسيط
+
+المرحلة الثانية:
+- نظام الـ QR Scanner
+- لوحة تحكم المدربين
+- نظام التقارير
+
+المرحلة الثالثة:
+- الميزات المتقدمة
+- التحسينات
+- الاختبار الشامل
+
+8. المخاطر المحتملة وحلولها
+-----------------------------
+
+أ) مشاكل الأداء:
+- استخدام فهارس مناسبة
+- تحسين الاستعلامات
+- نظام cache
+
+ب) مشاكل الأمان:
+- تشفير البيانات
+- التحقق من المدخلات
+- نظام صلاحيات
+
+ج) مشاكل الاستخدام:
+- واجهة سهلة الاستخدام
+- دليل المستخدم
+- دعم فني
+
+================================ 
