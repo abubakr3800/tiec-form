@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../cache/db.php';
+require_once '../config/database.php';
 
 // التحقق من تسجيل الدخول
 if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'admin') {
@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'admin') {
 }
 
 try {
-    // $pdo is already available from cache/db.php
+    $pdo = getDBConnection();
     
     $where_conditions = [];
     $params = [];
@@ -27,7 +27,7 @@ try {
     }
     
     if (!empty($_POST['search'])) {
-        $where_conditions[] = "(name LIKE ? OR email LIKE ? OR username LIKE ?)";
+        $where_conditions[] = "(name_ar LIKE ? OR name_en LIKE ? OR email LIKE ?)";
         $search_term = '%' . $_POST['search'] . '%';
         $params[] = $search_term;
         $params[] = $search_term;
@@ -39,7 +39,7 @@ try {
         $where_clause = 'WHERE ' . implode(' AND ', $where_conditions);
     }
     
-    $sql = "SELECT id, username, name, email, specialization, phone, is_active, created_at, updated_at, last_login FROM trainers $where_clause ORDER BY created_at DESC";
+    $sql = "SELECT id, name_ar, name_en, email, specialization, phone, bio_ar, bio_en, is_active, created_at, updated_at, last_login FROM trainers $where_clause ORDER BY created_at DESC";
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
     $trainers = $stmt->fetchAll();
@@ -48,11 +48,13 @@ try {
     foreach ($trainers as $trainer) {
         $data[] = [
             'id' => $trainer['id'],
-            'username' => htmlspecialchars($trainer['username']),
-            'name' => htmlspecialchars($trainer['name']),
+            'name' => htmlspecialchars($trainer['name_ar']),
+            'name_en' => htmlspecialchars($trainer['name_en']),
             'email' => htmlspecialchars($trainer['email']),
             'specialization' => htmlspecialchars($trainer['specialization']),
             'phone' => htmlspecialchars($trainer['phone']),
+            'bio_ar' => htmlspecialchars($trainer['bio_ar']),
+            'bio_en' => htmlspecialchars($trainer['bio_en']),
             'is_active' => $trainer['is_active'],
             'created_at' => $trainer['created_at'],
             'updated_at' => $trainer['updated_at'],
