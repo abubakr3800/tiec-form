@@ -69,7 +69,8 @@ try {
     $data = [
         'username' => $username,
         'password' => $hashed_password,
-        'name' => trim($_POST['name']),
+        'name_ar' => trim($_POST['name']),
+        'name_en' => trim($_POST['name']), // نفس الاسم بالعربية والإنجليزية
         'email' => $email,
         'phone' => !empty($_POST['phone']) ? trim($_POST['phone']) : null,
         'specialization' => !empty($_POST['specialization']) ? trim($_POST['specialization']) : null
@@ -77,9 +78,9 @@ try {
     
     // حفظ البيانات حسب نوع المستخدم
     if ($user_type === 'admin') {
-        $sql = "INSERT INTO admins (username, password, name, email) VALUES (:username, :password, :name, :email)";
+        $sql = "INSERT INTO admins (username, password, name_ar, name_en, email) VALUES (:username, :password, :name_ar, :name_en, :email)";
     } else {
-        $sql = "INSERT INTO trainers (username, password, name, email, specialization, phone) VALUES (:username, :password, :name, :email, :specialization, :phone)";
+        $sql = "INSERT INTO trainers (username, password, name_ar, name_en, email, specialization, phone) VALUES (:username, :password, :name_ar, :name_en, :email, :specialization, :phone)";
     }
     
     $stmt = $pdo->prepare($sql);

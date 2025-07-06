@@ -1,45 +1,45 @@
 version: '3.8'
 
 services:
-  web:
-    image: php:8.1-apache
-    ports:
-      - "8080:80"
-    volumes:
-      - .:/var/www/html
-    depends_on:
-      - db
-    environment:
-      - APACHE_DOCUMENT_ROOT=/var/www/html
-    command: >
-      sh -c "a2enmod rewrite &&
-              docker-php-ext-install pdo pdo_mysql &&
-              apache2-foreground"
+    web:
+        image: php:8.1-apache
+        ports:
+            - '8080:80'
+        volumes:
+            - .:/var/www/html
+        depends_on:
+            - db
+        environment:
+            - APACHE_DOCUMENT_ROOT=/var/www/html
+        command: >
+            sh -c "a2enmod rewrite &&
+                    docker-php-ext-install pdo pdo_mysql &&
+                    apache2-foreground"
 
-  db:
-    image: mysql:8.0
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: tiec_form
-      MYSQL_USER: tiec
-      MYSQL_PASSWORD: tiec123
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - ./database.sql:/docker-entrypoint-initdb.d/init.sql
+    db:
+        image: mysql:8.0
+        ports:
+            - '3306:3306'
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: tiec_form
+            MYSQL_USER: tiec
+            MYSQL_PASSWORD: tiec123
+        volumes:
+            - mysql_data:/var/lib/mysql
+            - ./database:/docker-entrypoint-initdb.d/init.sql
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    ports:
-      - "8081:80"
-    environment:
-      PMA_HOST: db
-      PMA_PORT: 3306
-      PMA_USER: root
-      PMA_PASSWORD: root
-    depends_on:
-      - db
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        ports:
+            - '8081:80'
+        environment:
+            PMA_HOST: db
+            PMA_PORT: 3306
+            PMA_USER: root
+            PMA_PASSWORD: root
+        depends_on:
+            - db
 
 volumes:
-  mysql_data: 
+    mysql_data:
