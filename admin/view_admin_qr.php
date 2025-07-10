@@ -130,6 +130,9 @@ try {
         .qr-actions .btn {
             margin: 5px;
         }
+        .qr-container img{
+            margin: 0 auto;
+        }
     </style>
 </head>
 <body>
@@ -210,10 +213,10 @@ try {
                             QR Code المشرف
                         </h5>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" style="text-align: center;">
                         <div class="qr-container">
                             <div id="qrcode"></div>
-                            <p class="text-muted mt-3">
+                            <p class="text-muted mt-3"  style="text-align: center;">
                                 <i class="fas fa-info-circle"></i>
                                 يمكن مسح هذا QR Code للوصول السريع لبيانات المشرف
                             </p>
@@ -242,8 +245,9 @@ try {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
-    
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script> -->
+    <script src="../assets/qr/jquery.min.js"></script>
+    <script src="../assets/qr/qrcode.min.js"></script>
     <script>
         // Wait for QRCode library to load
         document.addEventListener('DOMContentLoaded', function() {
@@ -279,21 +283,19 @@ try {
             try {
                 const qrData = <?php echo json_encode($qr_json, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS); ?>;
                 
-                QRCode.toCanvas(document.getElementById('qrcode'), qrData, {
+                // Create QRCode instance
+                const qrcode = new QRCode(document.getElementById('qrcode'), {
                     width: 200,
-                    margin: 2,
-                    color: {
-                        dark: '#000000',
-                        light: '#FFFFFF'
-                    }
-                }, function (error) {
-                    if (error) {
-                        console.error('QRCode generation error:', error);
-                        document.getElementById('qrcode').innerHTML = '<p class="text-danger">خطأ في إنشاء QR Code</p>';
-                    } else {
-                        console.log('QRCode generated successfully');
-                    }
+                    height: 200,
+                    colorDark: '#000000',
+                    colorLight: '#FFFFFF',
+                    correctLevel: QRCode.CorrectLevel.H
                 });
+                
+                // Generate the QR code
+                qrcode.makeCode(JSON.stringify(qrData));
+                
+                console.log('QRCode generated successfully');
             } catch (error) {
                 console.error('Error in generateQRCode:', error);
                 document.getElementById('qrcode').innerHTML = '<p class="text-danger">خطأ في إنشاء QR Code</p>';
@@ -302,11 +304,11 @@ try {
 
         // Download QR Code
         function downloadQR() {
-            const canvas = document.querySelector('#qrcode canvas');
-            if (canvas) {
+            const qrImage = document.querySelector('#qrcode img');
+            if (qrImage) {
                 const link = document.createElement('a');
                 link.download = 'admin-qr-<?php echo $admin_id; ?>.png';
-                link.href = canvas.toDataURL();
+                link.href = qrImage.src;
                 link.click();
             } else {
                 alert('QR Code not generated yet');
@@ -334,16 +336,19 @@ try {
                 });
             } else {
                 // Fallback for browsers that don't support Web Share API
-                const canvas = document.querySelector('#qrcode canvas');
-                if (canvas) {
-                    canvas.toBlob(function(blob) {
-                        const url = URL.createObjectURL(blob);
-                        const link = document.createElement('a');
-                        link.href = url;
-                        link.download = 'admin-qr-<?php echo $admin_id; ?>.png';
-                        link.click();
-                        URL.revokeObjectURL(url);
-                    });
+                const qrImage = document.querySelector('#qrcode img');
+                if (qrImage) {
+                    // Convert img to blob for download
+                    fetch(qrImage.src)
+                        .then(res => res.blob())
+                        .then(blob => {
+                            const url = URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = 'admin-qr-<?php echo $admin_id; ?>.png';
+                            link.click();
+                            URL.revokeObjectURL(url);
+                        });
                 } else {
                     alert('QR Code not generated yet');
                 }
