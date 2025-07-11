@@ -39,7 +39,7 @@ try {
         $where_clause = 'WHERE ' . implode(' AND ', $where_conditions);
     }
     
-    $sql = "SELECT id, name_ar, name_en, email, specialization, phone, bio_ar, bio_en, is_active, created_at, updated_at, last_login FROM trainers $where_clause ORDER BY created_at DESC";
+    $sql = "SELECT id, name_ar, name_en, email, specialization, phone, bio_ar, bio_en, is_active, created_at, updated_at FROM trainers $where_clause ORDER BY created_at DESC";
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
     $trainers = $stmt->fetchAll();
@@ -58,7 +58,7 @@ try {
             'is_active' => $trainer['is_active'],
             'created_at' => $trainer['created_at'],
             'updated_at' => $trainer['updated_at'],
-            'last_login' => $trainer['last_login']
+            'last_login' => null // سيتم إضافته لاحقاً عند تطوير نظام تسجيل الدخول
         ];
     }
     

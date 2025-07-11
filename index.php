@@ -8,6 +8,31 @@ if (isset($_COOKIE['registered_user'])) {
     exit();
 }
 
+// التحقق من وجود token في المعاملات
+$selected_service_id = null;
+$participant_token = null;
+
+if (isset($_GET['token']) && !empty($_GET['token'])) {
+    $participant_token = $_GET['token'];
+    
+    // التحقق من صحة الرمز
+    $pdo = getDBConnection();
+    $stmt = $pdo->prepare("SELECT * FROM participants WHERE qr_code = ?");
+    $stmt->execute([$participant_token]);
+    $participant = $stmt->fetch();
+    
+    if ($participant) {
+        // حفظ بيانات المشارك في الجلسة
+        $_SESSION['participant_id'] = $participant['id'];
+        $_SESSION['participant_name'] = $participant['name'];
+        $_SESSION['participant_token'] = $participant['qr_code'];
+    }
+}
+
+if (isset($_GET['service_id']) && !empty($_GET['service_id'])) {
+    $selected_service_id = (int)$_GET['service_id'];
+}
+
 // الحصول على الخدمات النشطة
 $pdo = getDBConnection();
 $stmt = $pdo->query("SELECT * FROM services WHERE is_active = 1 ORDER BY sort_order");
@@ -910,6 +935,13 @@ $services = $stmt->fetchAll();
                // تهيئة الصفحة
                document.addEventListener('DOMContentLoaded', function() {
                               updateLanguage();
+                              
+                              // اختيار الخدمة تلقائياً إذا تم تمريرها
+                              <?php if ($selected_service_id): ?>
+                              document.getElementById('service_id').value = '<?= $selected_service_id ?>';
+                              // تشغيل حدث change لتحميل الأسئلة
+                              document.getElementById('service_id').dispatchEvent(new Event('change'));
+                              <?php endif; ?>
                });
                </script>
 </body>

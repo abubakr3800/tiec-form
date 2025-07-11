@@ -367,14 +367,7 @@ $pdo = getDBConnection();
                             return new Date(data).toLocaleDateString('ar-SA');
                         }
                     },
-                    { 
-                        data: 'training_confirmation',
-                        render: function(data) {
-                            return data == 1 ? 
-                                '<span class="badge bg-success">مؤكد</span>' : 
-                                '<span class="badge bg-warning">غير مؤكد</span>';
-                        }
-                    },
+                    // تم حذف عمود training_confirmation
                     {
                         data: 'id',
                         render: function(data) {

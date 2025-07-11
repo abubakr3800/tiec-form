@@ -26,12 +26,10 @@ try {
     // جلب تسجيلات المشارك
     $stmt = $pdo->prepare("
         SELECT r.*, s.name_ar as service_name, s.service_type,
-               t.title_ar as training_title, t.start_date, t.end_date, t.start_time, t.end_time,
-               tr.name as trainer_name
+               tr.name_ar as trainer_name
         FROM registrations r
         JOIN services s ON r.service_id = s.id
-        LEFT JOIN trainings t ON r.training_id = t.id
-        LEFT JOIN trainers tr ON t.trainer_id = tr.id
+        LEFT JOIN trainers tr ON r.trainer_id = tr.id
         WHERE r.participant_id = ?
         ORDER BY r.created_at DESC
     ");
@@ -40,11 +38,11 @@ try {
     
     // جلب سجل الحضور
     $stmt = $pdo->prepare("
-        SELECT a.*, t.title_ar as training_title, s.name_ar as service_name
+        SELECT a.*, s.name_ar as service_name
         FROM attendance a
-        JOIN trainings t ON a.training_id = t.id
-        JOIN services s ON t.service_id = s.id
-        WHERE a.participant_id = ?
+        JOIN registrations r ON a.registration_id = r.id
+        LEFT JOIN services s ON r.service_id = s.id
+        WHERE r.participant_id = ?
         ORDER BY a.attendance_date DESC, a.check_in_time DESC
     ");
     $stmt->execute([$participant_id]);
@@ -148,13 +146,16 @@ $attendance_statuses = [
                             <h2 class="mb-1">
                                 <i class="fas fa-list"></i> تسجيلاتي
                             </h2>
-                            <p class="text-muted">مرحباً <?= htmlspecialchars($participant['name']) ?></p>
+                            <p class="text-muted">
+                                مرحباً <?= htmlspecialchars($participant['name']) ?>
+                                <span class="badge bg-success ms-2">مسجل دخول</span>
+                            </p>
                         </div>
                         <div>
                             <a href="index.php" class="btn btn-primary me-2">
                                 <i class="fas fa-plus"></i> تسجيل جديد
                             </a>
-                            <a href="token_login.php" class="btn btn-outline-secondary">
+                            <a href="logout.php" class="btn btn-outline-secondary">
                                 <i class="fas fa-sign-out-alt"></i> تسجيل خروج
                             </a>
                         </div>
@@ -210,28 +211,28 @@ $attendance_statuses = [
                                                     <?= htmlspecialchars($registration['service_name']) ?>
                                                 </h5>
                                                 
-                                                <?php if ($registration['training_title']): ?>
-                                                    <p class="mb-2">
-                                                        <strong>التدريب:</strong> <?= htmlspecialchars($registration['training_title']) ?>
-                                                    </p>
+                                                <?php if ($registration['trainer_name']): ?>
                                                     <p class="mb-2">
                                                         <strong>المدرب:</strong> <?= htmlspecialchars($registration['trainer_name']) ?>
                                                     </p>
-                                                    <p class="mb-2">
-                                                        <strong>التاريخ:</strong> 
-                                                        <?= date('Y/m/d', strtotime($registration['start_date'])) ?> - 
-                                                        <?= date('Y/m/d', strtotime($registration['end_date'])) ?>
-                                                    </p>
-                                                    <p class="mb-2">
-                                                        <strong>الوقت:</strong> 
-                                                        <?= $registration['start_time'] ?> - <?= $registration['end_time'] ?>
-                                                    </p>
                                                 <?php endif; ?>
+                                                
+                                                <p class="mb-2">
+                                                    <strong>تاريخ التسجيل:</strong> 
+                                                    <?= date('Y/m/d', strtotime($registration['registration_date'])) ?>
+                                                </p>
                                                 
                                                 <p class="mb-0">
                                                     <strong>تاريخ التسجيل:</strong> 
                                                     <?= date('Y/m/d H:i', strtotime($registration['created_at'])) ?>
                                                 </p>
+                                                
+                                                <?php if ($registration['notes']): ?>
+                                                    <p class="mb-0 mt-2">
+                                                        <strong>ملاحظات:</strong> 
+                                                        <small class="text-muted"><?= htmlspecialchars($registration['notes']) ?></small>
+                                                    </p>
+                                                <?php endif; ?>
                                             </div>
                                             
                                             <div class="col-md-4 text-end">
@@ -263,16 +264,18 @@ $attendance_statuses = [
                                     <div class="attendance-card">
                                         <div class="row align-items-center">
                                             <div class="col-md-8">
-                                                <h6 class="mb-2"><?= htmlspecialchars($record['training_title']) ?></h6>
-                                                <p class="mb-1">
-                                                    <strong>الخدمة:</strong> <?= htmlspecialchars($record['service_name']) ?>
-                                                </p>
+                                                <h6 class="mb-2"><?= htmlspecialchars($record['service_name']) ?></h6>
                                                 <p class="mb-1">
                                                     <strong>التاريخ:</strong> <?= date('Y/m/d', strtotime($record['attendance_date'])) ?>
                                                 </p>
                                                 <?php if ($record['check_in_time']): ?>
-                                                    <p class="mb-0">
+                                                    <p class="mb-1">
                                                         <strong>وقت الحضور:</strong> <?= $record['check_in_time'] ?>
+                                                    </p>
+                                                <?php endif; ?>
+                                                <?php if ($record['check_out_time']): ?>
+                                                    <p class="mb-0">
+                                                        <strong>وقت الانصراف:</strong> <?= $record['check_out_time'] ?>
                                                     </p>
                                                 <?php endif; ?>
                                             </div>

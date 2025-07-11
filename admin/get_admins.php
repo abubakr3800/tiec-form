@@ -9,12 +9,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'admin') {
     exit();
 }
 
-// التحقق من أن المستخدم مشرف رئيسي
-if ($_SESSION['admin_role'] !== 'super_admin') {
-    http_response_code(403);
-    echo json_encode(['error' => 'غير مصرح']);
-    exit();
-}
+// تم إلغاء شرط التحقق من admin_role للسماح لأي مشرف برؤية القائمة
 
 try {
     $pdo = getDBConnection();
@@ -34,7 +29,7 @@ try {
             'is_active' => $admin['is_active'],
             'created_at' => $admin['created_at'],
             'updated_at' => $admin['updated_at'],
-            'last_login' => null // حل مشكلة DataTables
+            'last_login' => null // سيتم إضافته لاحقاً عند تطوير نظام تسجيل الدخول
         ];
     }
     

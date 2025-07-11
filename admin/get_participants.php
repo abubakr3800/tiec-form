@@ -13,29 +13,32 @@ header('Content-Type: application/json');
 try {
     $pdo = getDBConnection();
     
-    // جلب جميع المشاركين
+    // جلب جميع المشاركين مع أول تاريخ تسجيل لهم
     $stmt = $pdo->query("
         SELECT 
-            id,
-            name,
-            national_id,
-            governorate,
+            p.id,
+            p.name,
+            p.national_id,
+            p.governorate,
             CASE 
-                WHEN gender = 'male' THEN 'ذكر'
-                WHEN gender = 'female' THEN 'أنثى'
-                ELSE gender
+                WHEN p.gender = 'male' THEN 'ذكر'
+                WHEN p.gender = 'female' THEN 'أنثى'
+                ELSE p.gender
             END as gender,
-            age,
-            phone,
+            p.age,
+            p.phone,
             CASE 
-                WHEN participant_type = 'student' THEN 'طالب'
-                WHEN participant_type = 'employee' THEN 'موظف'
-                WHEN participant_type = 'other' THEN 'أخرى'
-                ELSE participant_type
+                WHEN p.participant_type = 'student' THEN 'طالب'
+                WHEN p.participant_type = 'employee' THEN 'موظف'
+                WHEN p.participant_type = 'other' THEN 'أخرى'
+                ELSE p.participant_type
             END as participant_type,
-            DATE_FORMAT(registration_date, '%Y-%m-%d %H:%i') as registration_date,
-            training_confirmation
-        FROM participants 
+            (
+                SELECT MIN(r.registration_date)
+                FROM registrations r
+                WHERE r.participant_id = p.id
+            ) as registration_date
+        FROM participants p
         ORDER BY registration_date DESC
     ");
     

@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['token'])) {
     $token = trim($_POST['token']);
     
     try {
-        $stmt = $pdo->prepare("SELECT * FROM participants WHERE token = ?");
+        $stmt = $pdo->prepare("SELECT * FROM participants WHERE qr_code = ?");
         $stmt->execute([$token]);
         $participant = $stmt->fetch();
         
@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['token'])) {
             // حفظ بيانات المشارك في الجلسة
             $_SESSION['participant_id'] = $participant['id'];
             $_SESSION['participant_name'] = $participant['name'];
-            $_SESSION['participant_token'] = $participant['token'];
+            $_SESSION['participant_token'] = $participant['qr_code'];
             
             $message = "تم تسجيل الدخول بنجاح! مرحباً " . htmlspecialchars($participant['name']);
             $message_type = "success";
@@ -234,7 +234,7 @@ try {
             
             // الانتقال إلى صفحة التسجيل مع الخدمة المختارة
             setTimeout(() => {
-                window.location.href = `index.php?service_id=${serviceId}&token=<?= $participant['token'] ?? '' ?>`;
+                window.location.href = `index.php?service_id=${serviceId}&token=<?= $participant['qr_code'] ?? '' ?>`;
             }, 500);
         }
 

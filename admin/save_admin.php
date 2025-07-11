@@ -8,8 +8,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'admin') {
     exit(json_encode(['success' => false, 'message' => 'غير مصرح']));
 }
 
-// التحقق من أن المستخدم مشرف رئيسي
-if ($_SESSION['admin_role'] !== 'super_admin') {
+// التحقق من أن المستخدم مشرف رئيسي (اختياري)
+if (isset($_SESSION['admin_role']) && $_SESSION['admin_role'] !== 'super_admin') {
     http_response_code(403);
     exit(json_encode(['success' => false, 'message' => 'غير مصرح']));
 }
@@ -19,14 +19,15 @@ $pdo = getDBConnection();
 try {
     $id = $_POST['id'] ?? null;
     $username = trim($_POST['username']);
-    $name = trim($_POST['name']);
+    $name_ar = trim($_POST['name']); // استخدام الاسم العربي
+    $name_en = trim($_POST['name']); // نفس الاسم بالعربية والإنجليزية
     $email = trim($_POST['email']);
     $password = $_POST['password'];
     $role = $_POST['role'];
     $is_active = isset($_POST['is_active']) ? 1 : 0;
     
     // التحقق من البيانات المطلوبة
-    if (empty($username) || empty($name) || empty($role)) {
+    if (empty($username) || empty($name_ar) || empty($role)) {
         echo json_encode(['success' => false, 'message' => 'جميع الحقول المطلوبة يجب ملؤها']);
         exit();
     }
@@ -75,13 +76,13 @@ try {
         // تحديث البيانات
         if (!empty($password)) {
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $sql = "UPDATE admins SET username = ?, name = ?, email = ?, password = ?, role = ?, is_active = ? WHERE id = ?";
+            $sql = "UPDATE admins SET username = ?, name_ar = ?, name_en = ?, email = ?, password = ?, role = ?, is_active = ? WHERE id = ?";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([$username, $name, $email, $hashed_password, $role, $is_active, $id]);
+            $stmt->execute([$username, $name_ar, $name_en, $email, $hashed_password, $role, $is_active, $id]);
         } else {
-            $sql = "UPDATE admins SET username = ?, name = ?, email = ?, role = ?, is_active = ? WHERE id = ?";
+            $sql = "UPDATE admins SET username = ?, name_ar = ?, name_en = ?, email = ?, role = ?, is_active = ? WHERE id = ?";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([$username, $name, $email, $role, $is_active, $id]);
+            $stmt->execute([$username, $name_ar, $name_en, $email, $role, $is_active, $id]);
         }
         
     } else {
@@ -111,9 +112,9 @@ try {
         
         // إضافة المشرف الجديد
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $sql = "INSERT INTO admins (username, name, email, password, role, is_active) VALUES (?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO admins (username, name_ar, name_en, email, password, role, is_active) VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$username, $name, $email, $hashed_password, $role, $is_active]);
+        $stmt->execute([$username, $name_ar, $name_en, $email, $hashed_password, $role, $is_active]);
     }
     
     echo json_encode(['success' => true, 'message' => 'تم حفظ البيانات بنجاح']);

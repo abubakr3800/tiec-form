@@ -65,21 +65,30 @@ try {
     // تشفير كلمة المرور
     $hashed_password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     
-    // إعداد البيانات للحفظ
-    $data = [
-        'username' => $username,
-        'password' => $hashed_password,
-        'name_ar' => trim($_POST['name']),
-        'name_en' => trim($_POST['name']), // نفس الاسم بالعربية والإنجليزية
-        'email' => $email,
-        'phone' => !empty($_POST['phone']) ? trim($_POST['phone']) : null,
-        'specialization' => !empty($_POST['specialization']) ? trim($_POST['specialization']) : null
-    ];
-    
     // حفظ البيانات حسب نوع المستخدم
     if ($user_type === 'admin') {
+        // إعداد البيانات للمشرف
+        $data = [
+            'username' => $username,
+            'password' => $hashed_password,
+            'name_ar' => trim($_POST['name']),
+            'name_en' => trim($_POST['name']), // نفس الاسم بالعربية والإنجليزية
+            'email' => $email
+        ];
+        
         $sql = "INSERT INTO admins (username, password, name_ar, name_en, email) VALUES (:username, :password, :name_ar, :name_en, :email)";
     } else {
+        // إعداد البيانات للمدرب
+        $data = [
+            'username' => $username,
+            'password' => $hashed_password,
+            'name_ar' => trim($_POST['name']),
+            'name_en' => trim($_POST['name']), // نفس الاسم بالعربية والإنجليزية
+            'email' => $email,
+            'phone' => !empty($_POST['phone']) ? trim($_POST['phone']) : null,
+            'specialization' => !empty($_POST['specialization']) ? trim($_POST['specialization']) : null
+        ];
+        
         $sql = "INSERT INTO trainers (username, password, name_ar, name_en, email, specialization, phone) VALUES (:username, :password, :name_ar, :name_en, :email, :specialization, :phone)";
     }
     

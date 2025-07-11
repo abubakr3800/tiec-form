@@ -52,7 +52,7 @@ try {
     // إنشاء جلسة للمستخدم
     $_SESSION['user_id'] = $user['id'];
     $_SESSION['username'] = $user['username'];
-    $_SESSION['user_name'] = $user['name'];
+    $_SESSION['user_name'] = $user['name_ar']; // استخدام الاسم العربي
     $_SESSION['user_type'] = $user_type;
     $_SESSION['user_email'] = $user['email'];
     

@@ -1,47 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Certificate Generator</title>
+    <title>مولد الشهادات - TIEC</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
         .certificate-container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
         }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .card-header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            border: none;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+        }
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+        }
         .certificate-preview {
-            border: 1px solid #ddd;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
             margin: 20px 0;
             text-align: center;
+            background: white;
+            padding: 20px;
         }
         .certificate-preview svg {
             max-width: 100%;
             height: auto;
+            border-radius: 5px;
         }
         .loading {
             display: none;
+        }
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
         }
     </style>
 </head>
 <body>
     <div class="container certificate-container">
-        <h1 class="text-center mb-4">Certificate Generator</h1>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <a href="index.php" class="btn btn-outline-light">
+                <i class="fas fa-arrow-right"></i> العودة للصفحة الرئيسية
+            </a>
+            <h1 class="text-center mb-0">مولد الشهادات - TIEC</h1>
+            <div style="width: 150px;"></div> <!-- Spacer for centering -->
+        </div>
         
         <div class="row">
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Enter Certificate Details</h5>
+                        <h5>إدخال بيانات الشهادة</h5>
                     </div>
                     <div class="card-body">
                         <form id="certificateForm">
                             <div class="mb-3">
-                                <label for="username" class="form-label">Name:</label>
+                                <label for="username" class="form-label">اسم المشارك:</label>
                                 <input type="text" class="form-control" id="username" name="username" required>
                             </div>
-                            <button type="submit" class="btn btn-primary">Generate Certificate</button>
+                            <button type="submit" class="btn btn-primary">عرض الشهادة</button>
                         </form>
                     </div>
                 </div>
@@ -50,11 +101,11 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Certificate Preview</h5>
+                        <h5>معاينة الشهادة</h5>
                     </div>
                     <div class="card-body">
                         <div id="certificatePreview" class="certificate-preview">
-                            <p class="text-muted">Enter a name to see the certificate preview</p>
+                            <p class="text-muted">أدخل اسم المشارك لمعاينة الشهادة</p>
                         </div>
                         <div class="loading mt-3">
                             <div class="d-flex justify-content-center">
@@ -62,7 +113,7 @@
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
                             </div>
-                            <p class="text-center mt-2">Generating PDF...</p>
+                            <p class="text-center mt-2">جاري إنشاء PDF...</p>
                         </div>
                     </div>
                 </div>
@@ -72,8 +123,8 @@
 
     <!-- jsPDF Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <!-- SVG to PDF plugin (local copy for reliability) -->
-    <script src="assets/libs/svg2pdf.umd.js"></script>
+    <!-- html2canvas for better PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <script>
         // Load the SVG certificate
@@ -81,19 +132,28 @@
         
         // Load the SVG file
         fetch('cert/Web Development.svg')
-            .then(response => response.text())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('فشل في تحميل ملف الشهادة');
+                }
+                return response.text();
+            })
             .then(svgContent => {
                 originalSvg = svgContent;
-                console.log('SVG loaded successfully');
+                console.log('تم تحميل ملف SVG بنجاح');
             })
             .catch(error => {
-                console.error('Error loading SVG:', error);
+                console.error('خطأ في تحميل SVG:', error);
+                document.getElementById('certificatePreview').innerHTML = 
+                    '<div class="alert alert-danger">خطأ في تحميل ملف الشهادة. يرجى التحقق من وجود الملف.</div>';
             });
 
         // Function to update the certificate preview
         function updateCertificatePreview(username) {
             if (!originalSvg) {
-                console.error('SVG not loaded yet');
+                console.error('لم يتم تحميل ملف SVG بعد');
+                document.getElementById('certificatePreview').innerHTML = 
+                    '<div class="alert alert-warning">جاري تحميل ملف الشهادة...</div>';
                 return;
             }
 
@@ -136,61 +196,56 @@
             loading.style.display = 'block';
 
             try {
-                // Parse SVG as DOM
-                const parser = new DOMParser();
-                const svgDoc = parser.parseFromString(originalSvg, 'image/svg+xml');
-                const usernameTspan = svgDoc.getElementById('username');
-                if (usernameTspan) {
-                    // Remove all attributes except id
-                    [...usernameTspan.attributes].forEach(attr => {
-                        if (attr.name !== 'id') usernameTspan.removeAttribute(attr.name);
-                    });
-                    // Set text content
-                    usernameTspan.textContent = username;
-                    // After clearing attributes
-                    usernameTspan.setAttribute('x', '360'); // or your SVG's center x
-                    usernameTspan.setAttribute('y', '200'); // or your desired y
-                    usernameTspan.setAttribute('text-anchor', 'middle');
-                    // Remove all siblings (other tspans) inside the parent <text>
-                    const parentText = usernameTspan.parentNode;
-                    if (parentText) {
-                        // Remove all child nodes except the usernameTspan
-                        [...parentText.childNodes].forEach(child => {
-                            if (child !== usernameTspan) parentText.removeChild(child);
-                        });
-                    }
-                }
-                // Serialize back to string
-                const serializer = new XMLSerializer();
-                const modifiedSvg = serializer.serializeToString(svgDoc.documentElement);
-
-                // Create a temporary container for the SVG
-                const tempContainer = document.createElement('div');
-                tempContainer.innerHTML = modifiedSvg;
-                const svgElement = tempContainer.querySelector('svg');
-
+                // Update the preview first
+                updateCertificatePreview(username);
+                
+                // Wait a bit for the SVG to render
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Get the certificate preview element
+                const certificateElement = document.getElementById('certificatePreview');
+                
+                // Use html2canvas to capture the certificate
+                const canvas = await html2canvas(certificateElement, {
+                    scale: 2, // Higher quality
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff'
+                });
+                
                 // Create PDF
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('landscape', 'mm', 'a4');
-
-                // Convert SVG to PDF
-                if (typeof window.svg2pdf !== 'function') {
-                    alert('svg2pdf.js library not loaded correctly!\nجرب تحديث الصفحة أو تحقق من اتصال الإنترنت أو جرب سكريبت آخر.');
-                    loading.style.display = 'none';
-                    return;
+                
+                // Calculate dimensions
+                const imgWidth = 297; // A4 width in mm
+                const pageHeight = 210; // A4 height in mm
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+                
+                // Add image to PDF
+                pdf.addImage(canvas, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                
+                // Add new page if needed
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(canvas, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
                 }
-                window.svg2pdf(svgElement, pdf, {
-                    width: 297, // A4 width in mm
-                    height: 210, // A4 height in mm
-                    preserveAspectRatio: true
-                });
-
+                
                 // Save the PDF
-                pdf.save(`certificate_${username.replace(/\s+/g, '_')}.pdf`);
+                const fileName = `certificate_${username.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+                pdf.save(fileName);
+                
+                // Show success message
+                alert('تم تحميل الشهادة بنجاح!');
 
             } catch (error) {
                 console.error('Error generating PDF:', error);
-                alert('Error generating PDF. Please try again.');
+                alert('خطأ في إنشاء PDF. يرجى المحاولة مرة أخرى.\nError: ' + error.message);
             } finally {
                 loading.style.display = 'none';
             }
@@ -216,12 +271,12 @@
 
         // Add download button functionality
         document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('btn-download')) {
+            if (e.target.classList.contains('btn-download') || e.target.closest('.btn-download')) {
                 const username = document.getElementById('username').value.trim();
                 if (username) {
                     generatePDF(username);
                 } else {
-                    alert('Please enter a name first.');
+                    alert('يرجى إدخال اسم المشارك أولاً.');
                 }
             }
         });
@@ -234,8 +289,8 @@
             // Add download button
             const downloadBtn = document.createElement('button');
             downloadBtn.type = 'button';
-            downloadBtn.className = 'btn btn-success ms-2 btn-download';
-            downloadBtn.textContent = 'Download PDF';
+            downloadBtn.className = 'btn btn-success me-2 btn-download';
+            downloadBtn.innerHTML = '<i class="fas fa-download"></i> تحميل PDF';
             submitBtn.parentNode.appendChild(downloadBtn);
         });
     </script>
