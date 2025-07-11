@@ -147,8 +147,17 @@ $services = $stmt->fetchAll();
                                                                                                          المتميزة</p>
                                                                            </div>
 
-                                                                           <!-- رسائل النجاح/الخطأ -->
-                                                                           <div id="alert-container"></div>
+                                                                                               <!-- رسائل النجاح/الخطأ -->
+                    <div id="alert-container"></div>
+                    
+                    <!-- رسالة تسجيل الخروج -->
+                    <?php if (isset($_GET['logout']) && $_GET['logout'] === 'success'): ?>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle"></i>
+                            تم تسجيل الخروج بنجاح
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    <?php endif; ?>
 
                                                                            <!-- نموذج التسجيل -->
                                                                            <form id="registration-form" method="POST"
@@ -906,6 +915,20 @@ $services = $stmt->fetchAll();
                                                                                                                         height: 200
                                                                                                          }
                                                                                                          );
+                                                                           // أضف qr_code كنص تحت رمز QR
+                                                                           const qrText = document.createElement('p');
+                                                                           qrText.className = 'mt-3 text-break';
+                                                                           qrText.style.direction = 'ltr';
+                                                                           qrText.textContent = data.qr_code;
+                                                                           document.getElementById('qr-code').appendChild(qrText);
+                                                                           // أضف زرار للانتقال إلى صفحة تسجيل الدخول بالرمز
+                                                                           const loginBtn = document.createElement('button');
+                                                                           loginBtn.className = 'btn btn-success mt-3';
+                                                                           loginBtn.innerHTML = '<i class="fas fa-key"></i> تسجيل الدخول بالرمز';
+                                                                           loginBtn.onclick = function() {
+                                                                               window.location.href = 'token_login.php';
+                                                                           };
+                                                                           document.getElementById('qr-code').appendChild(loginBtn);
                                                                            }
 
                                                                            // إعادة تعيين النموذج

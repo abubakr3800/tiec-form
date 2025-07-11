@@ -203,7 +203,13 @@ try {
 
                         <!-- أزرار الإجراءات -->
                         <div class="text-center">
-                            <a href="index.php" class="btn btn-primary me-2">
+                            <a href="dashboard.php" class="btn btn-primary me-2">
+                                <i class="fas fa-tachometer-alt"></i> لوحة التحكم
+                            </a>
+                            <a href="dashboard.php" class="btn btn-outline-primary me-2">
+                                <i class="fas fa-user"></i> لوحه التحكم 
+                            </a>
+                            <a href="register_new_service.php" class="btn btn-outline-primary me-2">
                                 <i class="fas fa-plus"></i> تسجيل في خدمة جديدة
                             </a>
                             <a href="view_my_registrations.php" class="btn btn-outline-primary me-2">

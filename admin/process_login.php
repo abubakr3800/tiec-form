@@ -31,11 +31,11 @@ try {
     // البحث عن المستخدم في الجدول المناسب
     if ($user_type === 'admin') {
         $stmt = $pdo->prepare("SELECT * FROM admins WHERE username = ? AND is_active = 1");
+        $stmt->execute([$username]);
     } else {
         $stmt = $pdo->prepare("SELECT * FROM trainers WHERE username = ? AND is_active = 1");
+        $stmt->execute([$username]);
     }
-    
-    $stmt->execute([$username]);
     $user = $stmt->fetch();
     
     if (!$user) {
@@ -51,8 +51,13 @@ try {
     
     // إنشاء جلسة للمستخدم
     $_SESSION['user_id'] = $user['id'];
-    $_SESSION['username'] = $user['username'];
-    $_SESSION['user_name'] = $user['name_ar']; // استخدام الاسم العربي
+    if ($user_type === 'admin') {
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['user_name'] = $user['name_ar']; // استخدام الاسم العربي
+    } else {
+        $_SESSION['username'] = $user['email'];
+        $_SESSION['user_name'] = $user['name_ar']; // أو يمكن استخدام name_en إذا أردت
+    }
     $_SESSION['user_type'] = $user_type;
     $_SESSION['user_email'] = $user['email'];
     
@@ -67,7 +72,7 @@ try {
     // إنشاء JWT token (اختياري)
     $token_data = [
         'user_id' => $user['id'],
-        'username' => $user['username'],
+        'username' => $user_type === 'admin' ? $user['username'] : $user['email'],
         'user_type' => $user_type,
         'exp' => time() + (86400 * 7) // 7 أيام
     ];

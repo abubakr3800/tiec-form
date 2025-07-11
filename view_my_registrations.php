@@ -152,8 +152,14 @@ $attendance_statuses = [
                             </p>
                         </div>
                         <div>
-                            <a href="index.php" class="btn btn-primary me-2">
-                                <i class="fas fa-plus"></i> تسجيل جديد
+                            <a href="dashboard.php" class="btn btn-primary me-2">
+                                <i class="fas fa-tachometer-alt"></i> لوحة التحكم
+                            </a>
+                            <a href="participant_profile.php" class="btn btn-outline-primary me-2">
+                                <i class="fas fa-user"></i> الملف الشخصي
+                            </a>
+                            <a href="register_new_service.php" class="btn btn-outline-primary me-2">
+                                <i class="fas fa-plus"></i> تسجيل في خدمة جديدة
                             </a>
                             <a href="logout.php" class="btn btn-outline-secondary">
                                 <i class="fas fa-sign-out-alt"></i> تسجيل خروج

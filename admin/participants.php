@@ -257,7 +257,6 @@ $pdo = getDBConnection();
                                 <th>العمر</th>
                                 <th>رقم الهاتف</th>
                                 <th>تاريخ التسجيل</th>
-                                <th>تأكيد التدريب</th>
                                 <th>الإجراءات</th>
                             </tr>
                         </thead>
@@ -269,9 +268,8 @@ $pdo = getDBConnection();
             </div>
         </div>
     </div>
-
-    <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+ <!-- Scripts -->
+ <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
@@ -286,7 +284,6 @@ $pdo = getDBConnection();
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
-
     <script>
         // Sidebar Toggle Functionality
         let sidebarCollapsed = false;
@@ -336,7 +333,11 @@ $pdo = getDBConnection();
                 serverSide: false,
                 ajax: {
                     url: 'get_participants.php',
-                    type: 'GET'
+                    type: 'GET',
+                    dataSrc: function(json) {
+                        console.log(json); // هذا سيطبع البيانات في الكونسول
+                        return json.data;
+                    }
                 },
                 columns: [
                     { data: 'name' },

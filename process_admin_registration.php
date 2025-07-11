@@ -52,10 +52,11 @@ try {
     // التحقق من عدم وجود اسم مستخدم مكرر
     if ($user_type === 'admin') {
         $stmt = $pdo->prepare("SELECT id FROM admins WHERE username = ? OR email = ?");
+        $stmt->execute([$username, $email]);
     } else {
-        $stmt = $pdo->prepare("SELECT id FROM trainers WHERE username = ? OR email = ?");
+        $stmt = $pdo->prepare("SELECT id FROM trainers WHERE email = ?");
+        $stmt->execute([$email]);
     }
-    $stmt->execute([$username, $email]);
     
     if ($stmt->rowCount() > 0) {
         echo json_encode(['success' => false, 'message' => 'اسم المستخدم أو البريد الإلكتروني مستخدم مسبقاً']);

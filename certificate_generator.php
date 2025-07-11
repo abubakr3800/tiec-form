@@ -73,9 +73,14 @@
 <body>
     <div class="container certificate-container">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <a href="index.php" class="btn btn-outline-light">
-                <i class="fas fa-arrow-right"></i> العودة للصفحة الرئيسية
-            </a>
+            <div>
+                <a href="dashboard.php" class="btn btn-primary me-2">
+                    <i class="fas fa-tachometer-alt"></i> لوحة التحكم
+                </a>
+                <a href="index.php" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-right"></i> العودة للصفحة الرئيسية
+                </a>
+            </div>
             <h1 class="text-center mb-0">مولد الشهادات - TIEC</h1>
             <div style="width: 150px;"></div> <!-- Spacer for centering -->
         </div>
@@ -212,11 +217,11 @@
                     allowTaint: true,
                     backgroundColor: '#ffffff'
                 });
-                
+
                 // Create PDF
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('landscape', 'mm', 'a4');
-                
+
                 // Calculate dimensions
                 const imgWidth = 297; // A4 width in mm
                 const pageHeight = 210; // A4 height in mm
@@ -235,7 +240,7 @@
                     pdf.addImage(canvas, 'PNG', 0, position, imgWidth, imgHeight);
                     heightLeft -= pageHeight;
                 }
-                
+
                 // Save the PDF
                 const fileName = `certificate_${username.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
                 pdf.save(fileName);
